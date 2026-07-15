@@ -108,7 +108,7 @@ export default function BlogGenerator() {
 
       const prompt = `Você é um redator especialista em educação infantil e fundamental para o Colégio Passos, escola moderna e afetiva.
 
-Escreva um artigo de blog com o seguinte tema: "${genPrompt}"
+Escreva um artigo de blog completo com o seguinte tema: "${genPrompt}"
 Categoria: ${form.category}
 
 Retorne SOMENTE um JSON válido com esta estrutura exata, sem blocos de markdown adicionais como \`\`\`json:
@@ -118,7 +118,9 @@ Retorne SOMENTE um JSON válido com esta estrutura exata, sem blocos de markdown
   "content": "Conteúdo completo em markdown (mínimo 350 palavras, use ## para subtítulos, seja envolvente e educativo)",
   "meta_description": "Meta description de 140-160 caracteres (com a keyword no início)",
   "target_keyword": "palavra-chave principal",
-  "readtime": "X min"
+  "readtime": "X min",
+  "image": "Uma URL funcional do Unsplash (resolução 1200x800) relacionada ao tema e à educação infantil. Use fotos reais de alta qualidade do Unsplash.",
+  "image_alt": "Descrição detalhada da imagem para acessibilidade SEO"
 }`;
 
       const result = await model.generateContent(prompt);
@@ -139,6 +141,8 @@ Retorne SOMENTE um JSON válido com esta estrutura exata, sem blocos de markdown
         meta_description:generated.meta_description || prev.meta_description,
         target_keyword:  generated.target_keyword || prev.target_keyword,
         readtime:        generated.readtime || prev.readtime,
+        image:           generated.image || 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&w=1200&q=80',
+        image_alt:       generated.image_alt || 'Livros e educação infantil',
         slug:            toSlug(generated.title || prev.title),
       }));
     } catch (err) {
