@@ -1,0 +1,48 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  --background: #FDFAF6;
+  --primary: #F97316;
+  --primary-dark: #C2410C;
+  --on-primary: #FFFFFF;
+  --secondary: #78716C;
+  --on-surface: #1C1917;
+  --outline-variant: #E7E5E4;
+  --secondary-container: #FFF7ED;
+  --surface-container-low: #F5F0EB;
+  --surface-container-lowest: #FFFFFF;
+  --surface-container-highest: #E7E5E4;
+  --surface-container-high: #EDE9E5;
+  --brand-orange: #F97316;
+  --brand-cream: #FDFAF6;
+  --brand-dark: #1C1917;
+}
+
+html.dark, body.dark {
+  --background: #1C1917;
+  --primary: #FB923C;
+  --primary-dark: #F97316;
+  --on-primary: #1C1917;
+  --secondary: #A8A29E;
+  --on-surface: #F5F0EB;
+  --outline-variant: #292524;
+  --secondary-container: #292524;
+  --surface-container-low: #231F1D;
+  --surface-container-lowest: #161311;
+  --surface-container-highest: #3C3735;
+  --surface-container-high: #2C2825;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-background text-on-surface antialiased;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+  h1, h2, h3 {
+    font-family: 'Playfair Display', Georgia, serif;
+  }
+}
