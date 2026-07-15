@@ -6,8 +6,9 @@ import {
   Image, Tag, Clock, ArrowLeft
 } from 'lucide-react';
 
+import { GoogleGenerativeAI } from '@google/generative-ai';
+
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
-const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${GEMINI_API_KEY}`;
 
 const CATEGORIES = ['Educação', 'Pedagogia', 'Família & Escola', 'Saúde Escolar', 'Eventos', 'Tecnologia na Educação', 'BNCC', 'Protagonismo'];
 
@@ -90,7 +91,7 @@ export default function BlogGenerator() {
 
   // ── Gemini AI Generation ──────────────────────────────────────────────────
   const generateWithGemini = async () => {
-    if (!GEMINI_API_KEY || GEMINI_API_KEY === 'COLE_SUA_CHAVE_AQUI') {
+    if (!GEMINI_API_KEY || GEMINI_API_KEY.includes('COLE_')) {
       setGenError('Configure VITE_GEMINI_API_KEY no arquivo .env para usar o gerador de IA.');
       return;
     }
@@ -101,13 +102,16 @@ export default function BlogGenerator() {
     setGenerating(true);
     setGenError('');
 
-    const prompt = `Você é um redator especialista em educação infantil e fundamental para o Colégio Passos, escola moderna e afetiva.
+    try {
+      const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
+      const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+
+      const prompt = `Você é um redator especialista em educação infantil e fundamental para o Colégio Passos, escola moderna e afetiva.
 
 Escreva um artigo de blog com o seguinte tema: "${genPrompt}"
 Categoria: ${form.category}
-Palavra-chave principal: ${form.target_keyword || '(defina uma relevante)'}
 
-Retorne SOMENTE um JSON válido com esta estrutura exata:
+Retorne SOMENTE um JSON válido com esta estrutura exata, sem blocos de markdown adicionais como \`\`\`json:
 {
   "title": "Título do artigo (com a keyword se possível)",
   "summary": "Resumo envolvente de 1-2 frases (com a keyword)",
@@ -117,17 +121,16 @@ Retorne SOMENTE um JSON válido com esta estrutura exata:
   "readtime": "X min"
 }`;
 
-    try {
-      const res = await fetch(GEMINI_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
-      });
-      const json = await res.json();
-      const text = json.candidates?.[0]?.content?.parts?.[0]?.text || '';
-      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      const result = await model.generateContent(prompt);
+      const response = await result.response;
+      const text = response.text();
+      
+      const cleanJsonText = text.replace(/```json/g, '').replace(/```/g, '').trim();
+      const jsonMatch = cleanJsonText.match(/\{[\s\S]*\}/);
       if (!jsonMatch) throw new Error('Resposta inválida da IA');
+      
       const generated = JSON.parse(jsonMatch[0]);
+      
       setForm(prev => ({
         ...prev,
         title:           generated.title || prev.title,
