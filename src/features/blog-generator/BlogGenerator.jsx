@@ -95,6 +95,10 @@ export default function BlogGenerator() {
       setGenError('Configure VITE_GEMINI_API_KEY no arquivo .env para usar o gerador de IA.');
       return;
     }
+    if (!GEMINI_API_KEY.startsWith('AIzaSy')) {
+      setGenError('A chave VITE_GEMINI_API_KEY no .env parece inválida. Chaves do Gemini Studio sempre começam com "AIzaSy". Obtenha uma chave de desenvolvimento gratuita em: https://aistudio.google.com/app/apikey');
+      return;
+    }
     if (!genPrompt.trim()) {
       setGenError('Descreva o tema do artigo antes de gerar.');
       return;
